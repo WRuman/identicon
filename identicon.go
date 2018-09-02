@@ -1,32 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"image"
+	"image/png"
+	"io"
 )
 
-func rgbaOfSize(x, y int) *image.RGBA {
-	r := image.Rect(0, 0, x, y)
-	i := image.NewRGBA(r)
-	return i
+type Identicon struct {
+	buffer  image.Image
+	message string
 }
 
-func traverse(i *image.RGBA) {
-	it := NewImagerator(i)
-	lastY := 0
-	for it.More() {
-		x, y := it.Next()
-		if y > lastY {
-			lastY = y
-			fmt.Println()
-		}
-		fmt.Printf("(%d,%d)", x, y)
+func NewIdenticon(width, height int, message string) *Identicon {
+	r := image.Rect(0, 0, width, height)
+	i := image.NewNRGBA(r)
+	return &Identicon{
+		buffer:  i,
+		message: message,
 	}
-	fmt.Println()
 }
 
-func main() {
-	fmt.Println("[[ Identicon ]]")
-	i := rgbaOfSize(8, 8)
-	traverse(i)
+func (idcon *Identicon) AsPNG(w io.Writer) error {
+	return png.Encode(w, idcon.buffer)
 }
